@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link rel="stylesheet" href="../uikit-3.13.7/css/uikit.min.css" />
+		<script src="../uikit-3.13.7/js/uikit.min.js"></script>
+		<script src="../uikit-3.13.7/js/uikit-icons.min.js"></script>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			main {
+				margin: 0 1%;
+			}
+
+			.add_to_cart_cta {
+				background-color: #39f;
+				color: white;
+				padding: 5px 15px;
+				font-size: 16px;
+				border: 1px solid transparent;
+				cursor: pointer;
+			}
+			.add_to_cart_cta:hover {
+				background-color: rgb(17, 89, 161);
+				border: 1px solid navy;
+			}
+			.add_to_cart_cta:disabled {
+				background: grey;
+				cursor: not-allowed;
+				color: white;
+				font-weight: bold;
+			}
+
+			.cart__flexDiv {
+				display: flex;
+			}
+
+			.cart_total {
+				margin-top: 20px;
+				font-weight: bold;
+				font-size: larger;
+			}
+		</style>
+	</head>
+	<body>
+		<nav
+			class="uk-navbar-container uk-margin"
+			uk-navbar
+			style="background: #39f"
+		>
+			<div class="uk-navbar-left">
+				<a class="uk-navbar-item uk-logo" href="./" style="color: white"
+					>Prushet Electronics</a
+				>
+			</div>
+		</nav>
+
+		<main>
+			<section>
+				<div uk-alert id="cart">
+					<h3>Cart</h3>
+				</div>
+			</section>
+			<br /><br />
+
+			<h3>Component Price List</h3>
+			<table class="uk-table uk-table-responsive uk-table-divider">
+				<thead>
+					<tr>
+						<th>Sr. No.</th>
+						<th>Title</th>
+						<th id="prices_heading">Price</th>
+						<th>Add to Cart</th>
+					</tr>
+				</thead>
+				<tbody id="prices_table__tbody"></tbody>
+			</table>
+		</main>
+
+		<script>
+			document
+				.getElementById("prices_heading")
+				.addEventListener("click", () => {
+					sortByPrice();
+				});
+
+			const random = (min, max) => {
+				return Math.floor(Math.random() * (max - min + 1)) + min;
+			};
+
+			let cart = [];
+
+			const items = [
+				{
+					title: "2x8 16GB DDR4 RAM",
+					price: random(5000, 6000),
+				},
+				{
+					title: "ATX - B450M ASUS Motherboard",
+					price: random(5000, 8000),
+				},
+				{
+					title: "1E2B Noctua CPU Cooler",
+					price: random(2000, 5000),
+				},
+				{
+					title: "Thermaltake 15gm Thermal Paste",
+					price: random(1500, 3200),
+				},
+				{
+					title: "LG 27-inch 8F2LL1B Monitor",
+					price: random(23000, 30000),
+				},
+				{
+					title: "Logitech Keyboard Mouse Combo",
+					price: random(1200, 1800),
+				},
+			];
+
+			let prices_table__item_rows = null;
+			const convert_items_to_rows = () => {
+				prices_table__item_rows = null;
+				prices_table__item_rows = items.map((item, index) => {
+					const { title, price } = item;
+					const tr = document.createElement("tr");
+
+					const srNoTD = document.createElement("td");
+					srNoTD.textContent = index + 1;
+
+					const titleTD = document.createElement("td");
+					const priceTD = document.createElement("td");
+					titleTD.textContent = title;
+					priceTD.textContent = price;
+
+					const ctaTD = document.createElement("td");
+					const add_to_cart_button = document.createElement("button");
+					add_to_cart_button.textContent = "+";
+					add_to_cart_button.id = `add_to_cart_cta__${index}`;
+					add_to_cart_button.classList.add("add_to_cart_cta");
+					add_to_cart_button.addEventListener("click", () => {
+						add_to_cart(index);
+					});
+					ctaTD.appendChild(add_to_cart_button);
+
+					tr.appendChild(srNoTD);
+					tr.appendChild(titleTD);
+					tr.appendChild(priceTD);
+					tr.appendChild(ctaTD);
+
+					return tr;
+				});
+			};
+
+			const init = () => {
+				convert_items_to_rows();
+				const prices_table__tbody = document.getElementById(
+					"prices_table__tbody"
+				);
+				prices_table__tbody.innerHTML = "";
+				prices_table__item_rows.forEach((prices_table__item_row) =>
+					prices_table__tbody.appendChild(prices_table__item_row)
+				);
+			};
+			init();
+
+			const add_to_cart = (item_index) => {
+				cart.push(item_index);
+				document.getElementById(
+					`add_to_cart_cta__${item_index}`
+				).disabled = true;
+				updateCart();
+			};
+
+			const updateCart = () => {
+				const cart_elem = document.getElementById("cart");
+
+				// Item selected List
+				const cartItemElems = cart.map((item_id, index) => {
+					const { title, price } = items[item_id];
+
+					const srNoDiv = document.createElement("div");
+					srNoDiv.textContent = index + 1;
+					srNoDiv.style = "margin-right: 20px";
+
+					const titleDiv = document.createElement("div");
+					titleDiv.textContent = title;
+					titleDiv.style = "margin-right: 20px";
+
+					const priceDiv = document.createElement("div");
+					priceDiv.style = "font-weight: bold";
+					priceDiv.textContent = price;
+
+					const flexDiv = document.createElement("div");
+					flexDiv.id = `cart_item__${item_id}`;
+					flexDiv.classList.add("cart__flexDiv");
+					flexDiv.appendChild(srNoDiv);
+					flexDiv.appendChild(titleDiv);
+					flexDiv.appendChild(priceDiv);
+
+					return flexDiv;
+				});
+
+				cart_elem.innerHTML = "";
+				cart_elem__heading = document.createElement("h3");
+				cart_elem__heading.textContent = "Cart";
+				cart_elem.appendChild(cart_elem__heading);
+
+				cartItemElems.forEach((cartItemElem) =>
+					cart_elem.appendChild(cartItemElem)
+				);
+
+				// Cart Total
+				let cart_total = 0;
+				cart.forEach((item_id, index) => {
+					const { price } = items[item_id];
+					cart_total += price;
+				});
+				const cart_total_elem = document.createElement("div");
+				cart_total_elem.textContent = `Total: ${cart_total}`;
+				cart_total_elem.classList.add("cart_total");
+				cart_elem.appendChild(cart_total_elem);
+			};
+
+			const sortByPrice = () => {
+				items.sort(function (a, b) {
+					return parseFloat(a.price) - parseFloat(b.price);
+				});
+				init();
+			};
+		</script>
+	</body>
+</html>
