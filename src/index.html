@@ -82,11 +82,10 @@
 		</main>
 
 		<script>
-			document
-				.getElementById("prices_heading")
-				.addEventListener("click", () => {
-					sortByPrice();
-				});
+			const prices_heading = document.getElementById("prices_heading");
+			prices_heading.addEventListener("click", () => {
+				sortByPrice();
+			});
 
 			const random = (min, max) => {
 				return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -230,6 +229,7 @@
 					return parseFloat(a.price) - parseFloat(b.price);
 				});
 				init();
+				prices_heading.innerHTML = "Price &#9660;";
 			};
 		</script>
 	</body>
