@@ -86,6 +86,7 @@
 			prices_heading.addEventListener("click", () => {
 				sortByPrice();
 			});
+			let sorted = false;
 
 			const random = (min, max) => {
 				return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -119,10 +120,17 @@
 					price: random(1200, 1800),
 				},
 			];
+			const og_items = [...items];
 
 			let prices_table__item_rows = null;
 			const convert_items_to_rows = () => {
 				prices_table__item_rows = null;
+
+				// Bug - Click on Add -> Sort -> Disabled State Lost
+				const cart_titles = cart.map((item_id) => {
+					return og_items[item_id].title;
+				});
+
 				prices_table__item_rows = items.map((item, index) => {
 					const { title, price } = item;
 					const tr = document.createElement("tr");
@@ -143,6 +151,10 @@
 					add_to_cart_button.addEventListener("click", () => {
 						add_to_cart(index);
 					});
+
+					if (cart_titles.includes(title))
+						add_to_cart_button.disabled = true;
+
 					ctaTD.appendChild(add_to_cart_button);
 
 					tr.appendChild(srNoTD);
@@ -151,6 +163,14 @@
 					tr.appendChild(ctaTD);
 
 					return tr;
+				});
+
+				// Convert old cart values to new cart values
+				cart = cart_titles.map((cart_title) => {
+					const item_new_index = items.findIndex(
+						(item) => item.title === cart_title
+					);
+					return item_new_index;
 				});
 			};
 
@@ -225,11 +245,13 @@
 			};
 
 			const sortByPrice = () => {
+				if (sorted) return;
 				items.sort(function (a, b) {
 					return parseFloat(a.price) - parseFloat(b.price);
 				});
 				init();
 				prices_heading.innerHTML = "Price &#9660;";
+				sorted = true;
 			};
 		</script>
 	</body>
